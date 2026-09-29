@@ -1,0 +1,17 @@
+{
+  "name": "premise-verification-example-trip-batch-collapse",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Executable Premise Verification violation and fix: a per-leg fan-out collapsed into one batched call with no receipt.",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "test:violation": "vitest run violation",
+    "test:fixed": "vitest run fixed"
+  },
+  "devDependencies": {
+    "@types/node": "^22.9.0",
+    "typescript": "^5.6.3",
+    "vitest": "^3.2.7"
+  }
+}
