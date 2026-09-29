@@ -24,6 +24,8 @@ function validReceipt(overrides: Partial<PremiseReceipt> = {}): PremiseReceipt {
     measuredAtPercentile: 'p95',
     isSerial: true,
     isOnCriticalPath: true,
+    serialEvidence:
+      'cold-start trace shows each single-leg call awaited before the next fires, zero overlap in the span timeline',
     predecessorLever: 'stop-cache prefetch ticket',
     predecessorGapReason:
       'that ticket cached stop metadata, not per-leg travel time; this fan-out was untouched by it',
@@ -82,6 +84,15 @@ describe('assertPremiseVerified: each condition is independently enforced', () =
 
   it('condition 2: rejects a cost that is not on the critical path', () => {
     expect(() => assertPremiseVerified(validReceipt({ isOnCriticalPath: false }))).toThrow(/condition 2/);
+  });
+
+  it('condition 2: rejects a bare isSerial/isOnCriticalPath claim with no evidence', () => {
+    expect(() => assertPremiseVerified(validReceipt({ serialEvidence: '' }))).toThrow(/condition 2/);
+  });
+
+  it('condition 2: rejects a stub serialEvidence that just restates the claim', () => {
+    expect(() => assertPremiseVerified(validReceipt({ serialEvidence: 'obviously serial' })))
+      .toThrow(/condition 2/);
   });
 
   it('condition 3: rejects a missing predecessor lever', () => {

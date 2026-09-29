@@ -29,9 +29,11 @@ had, for any trip size. The batched path only runs if you pass a
 [`PremiseReceipt`](./fixed/src/premise-receipt.ts) that
 [`assertPremiseVerified`](./fixed/src/premise-receipt.ts) accepts, meaning all four conditions
 from [`../../PREMISE-VERIFICATION.md`](../../PREMISE-VERIFICATION.md) are answered with real
-values, not placeholders. And because verifying condition 1 means actually measuring the path,
-the fixed version also chunks the batched calls at `MAX_BATCH_WAYPOINTS` instead of ignoring the
-cap, so a large trip gets a correct total either way.
+values, not placeholders. The guard enforces that each condition is concretely and specifically
+answered; it cannot verify the answers are true, which stays a review responsibility, the same
+limit the real rule has when a human reads the receipt. And because verifying condition 1 means
+actually measuring the path, the fixed version also chunks the batched calls at
+`MAX_BATCH_WAYPOINTS` instead of ignoring the cap, so a large trip gets a correct total either way.
 
 This is an original toy scenario built to demonstrate the failure class Premise Verification
 names: an unmeasured "fewer calls is faster" assumption shipped as a structural collapse. It is

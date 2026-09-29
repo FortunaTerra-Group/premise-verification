@@ -16,6 +16,8 @@ export interface PremiseReceipt {
   isSerial: boolean;
   /** Condition 2: the named cost is actually on the critical path. */
   isOnCriticalPath: boolean;
+  /** Condition 2: real evidence for isSerial/isOnCriticalPath, not a bare claim. */
+  serialEvidence: string;
   /** Condition 3: the prior ticket or lever that was checked. */
   predecessorLever: string;
   /** Condition 3: what that predecessor lever missed, and why. */
@@ -34,6 +36,15 @@ export class PremiseNotVerifiedError extends Error {
 // Justifications that only restate obviousness, with no measurement behind
 // them, are exactly what condition 4 exists to reject.
 const STUB_JUSTIFICATIONS = new Set(['obviously faster', 'clearly faster', 'obvious win', 'trust me']);
+
+// A bare "isSerial: true" is a claim, not a receipt. These stand-ins for real
+// evidence are exactly what condition 2's evidence field exists to reject.
+const STUB_SERIAL_EVIDENCE = new Set([
+  'obviously serial',
+  'seems serial',
+  'probably serial',
+  'trust me',
+]);
 
 export function assertPremiseVerified(receipt: PremiseReceipt): void {
   if (!receipt.path.trim()) {
@@ -54,6 +65,12 @@ export function assertPremiseVerified(receipt: PremiseReceipt): void {
   if (!receipt.isSerial || !receipt.isOnCriticalPath) {
     throw new PremiseNotVerifiedError(
       'condition 2: the named cost is not both serial and on the critical path; collapsing a parallel or shadowed cost is a false win',
+    );
+  }
+  const serialEvidence = receipt.serialEvidence.trim();
+  if (!serialEvidence || STUB_SERIAL_EVIDENCE.has(serialEvidence.toLowerCase())) {
+    throw new PremiseNotVerifiedError(
+      'condition 2: serialEvidence is empty or a stub that restates the claim instead of evidence for it',
     );
   }
   if (!receipt.predecessorLever.trim() || !receipt.predecessorGapReason.trim()) {
